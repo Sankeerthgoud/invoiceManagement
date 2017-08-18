@@ -1,22 +1,51 @@
 package com.rbs.supplyChain.services;
+import com.rbs.supplyChain.businessLogic.*;
+import com.rbs.supplyChain.model.Invoice;
 
+import java.sql.SQLException;
 
 import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.json.simple.JSONObject;
+
 @Path("/invoice")
 public class InvoiceManagementService {
+	
 	@POST
 	@Path("/search")
 	@Produces(MediaType.TEXT_HTML)
-	public Response searchByInvoiceNo(@FormParam("invoiceNo") String invoiceNo){
-		String responseString = "<h1>Search Invoice By number</h1><hr><strong>Searched Invoice is:</strong>"+ invoiceNo;
-		return Response.status(200).entity(responseString).build();
+	public Response searchByInvoiceNo(@FormParam("invoiceNo") String invoiceNo) throws ClassNotFoundException, SQLException{
+		InvoiceLogic logicObj = new InvoiceLogic();
+		Invoice resultObj=null;
+		try {
+			resultObj = new Invoice();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		resultObj = logicObj.search(invoiceNo);
+		/*String responseString = "<h1>Search Invoice By number</h1><hr>"
+				+"<strong>Searched Invoice is:</strong>"+ invoiceNo;*/
+		/*return Response.status(200).entity(responseString).build();*/
+		
+		JSONObject obj = new JSONObject();
+
+	      obj.put("invoiceNo",resultObj.invoiceNo);
+	      obj.put("buyerId",resultObj.buyerId);
+	      obj.put("sellerId",resultObj.sellerId);
+	      obj.put("tax",resultObj.tax);
+	      
+	      String jsonText = obj.toString();
+	      System.out.print(jsonText);
+		
+	      return Response.status(200).entity(jsonText).build();
+		
+	      /*chrome-extension://gfapgpggdkbhijehajhokdljclpmoknl/grouptabs.html
+*/		
 	}
 	
 	@POST
